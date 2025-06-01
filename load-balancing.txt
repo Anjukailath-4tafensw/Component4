@@ -1,0 +1,18 @@
+Nginx load balancer
+http {
+  upstream courses_api {
+    server localhost:3001;
+    server localhost:3002;
+    server localhost:3003;
+  }
+
+  server {
+    listen 80;
+
+    location / {
+      proxy_pass http://courses_api;
+    }
+  }
+}
+
+or use Azure load balancer

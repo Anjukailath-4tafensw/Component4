@@ -1,0 +1,15 @@
+By deploying multiple instances
+
+Enable automated daily backups (MongoDB Atlas)
+
+Periodically test disaster recovery with mock restores
+
+Store backups in separate regions or cloud buckets
+
+MongoDB :
+
+Daily automated backups
+
+Monitoring alerts configure via Atlas console
+
+

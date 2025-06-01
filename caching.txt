@@ -1,0 +1,34 @@
+In-memmory caching
+******************
+Use in-memory stores like Redis or Memcached to cache frequently accessed data and reduce the load on databases.
+Steps:
+
+npm install redis
+
+Code to be added in index.js :
+
+import { createClient } from 'redis';
+
+const redisClient = createClient();
+await redisClient.connect();
+
+// To check cache
+const cache = async (req, res, next) => {
+  const cachedData = await redisClient.get('all_courses');
+  if (cachedData) {
+    return res.json(JSON.parse(cachedData));
+  }
+  next();
+};
+
+// Get all courses
+app.get('/courses', cache, async (req, res) => {
+  const courses = await Course.find({});
+  await redisClient.setEx('all_courses', 3600, JSON.stringify(courses)); // TTL = 1 hour
+  res.json(courses);
+});
+
+//Clear cache(add below code in post new course API)
+await redisClient.del('all_courses');
+
+
