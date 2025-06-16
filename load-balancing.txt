@@ -16,3 +16,138 @@ http {
 }
 
 or use Azure load balancer
+
+Step 1: Log in to the Azure Portal
+Go to https://portal.azure.com and sign in with  Azure account.
+
+Step 2: Create a Resource Group
+In the left-hand menu, click on "Resource groups".
+
+Click “+ Create”.
+
+Fill in:
+
+Subscription: Choose  subscription
+
+Resource group: courseapp-rg
+
+Region: Choose a region (e.g., East US)
+
+Click Review + Create → then Create.
+
+Step 3: Create a Virtual Network and Subnets
+In the search bar, type "Virtual networks" → click + Create.
+
+Fill in:
+
+Name: courseapp-vnet
+
+Resource group: courseapp-rg
+
+Region: Same as above
+
+Go to the IP Addresses tab:
+
+Address space: 10.0.0.0/16
+
+Add two subnets:
+
+frontend-subnet: 10.0.1.0/24
+
+backend-subnet: 10.0.2.0/24
+
+Click Review + Create → then Create.
+
+Step 4: Create Virtual Machines (Backend API Servers)
+In the Azure Portal, search "Virtual machines" → click + Create.
+
+Fill in:
+
+VM name: backend-api-vm1
+
+Resource group: courseapp-rg
+
+Region: Same as above
+
+Availability: Use Availability set (recommended)
+
+Image: Ubuntu 22.04 LTS
+
+Size: Choose based on load (e.g., B2ms)
+
+Authentication: SSH or password
+
+Inbound ports: Allow HTTP (80), and optionally HTTPS (443)
+
+In the Networking tab:
+
+Select courseapp-vnet
+
+Subnet: backend-subnet
+
+Complete creation → Repeat to create additional VMs (e.g., backend-api-vm2, backend-api-vm3)
+
+Deploy  backend API on each VM and expose it on port 80 (or  chosen port).
+
+Step 5: Create a Load Balancer
+Search for "Load balancers" → click + Create.
+
+Fill in:
+
+Name: courseapp-lb
+
+Region: Same as above
+
+Type: Public
+
+SKU: Standard (recommended)
+
+Frontend IP: Create a new public IP (e.g., courseapp-lb-ip)
+
+Click Review + Create → then Create.
+
+Step 6: Configure Load Balancer
+Go to the newly created load balancer.
+
+a. Frontend IP Configuration
+Confirm a frontend IP (e.g., courseapp-lb-ip) exists
+
+b. Backend Pools
+Go to Backend Pools → + Add
+
+Name: backendpool
+
+Associate VMs (backend-api-vm1, vm2, etc.) to the backend pool
+
+c. Health Probe
+Go to Health Probes → + Add
+
+Name: api-health-probe
+
+Protocol: HTTP
+
+Port: 80
+
+Path: /health ( backend must respond on this endpoint with 200 OK)
+
+d. Load Balancing Rules
+Go to Load Balancing Rules → + Add
+
+Name: http-rule
+
+Frontend IP: select  IP
+
+Backend pool: backendpool
+
+Protocol: TCP
+
+Port: 80
+
+Health probe: api-health-probe
+
+Step 7: Test the Load Balancer
+In Load Balancer → Frontend IP Configuration, copy the public IP
+
+Paste the IP in a browser: http://<public-ip>
+
+We can see a response from one of your backend API VMs
